@@ -16,13 +16,19 @@ class _HomepageState extends State<Homepage> {
   final ageController = TextEditingController();
   final formkey = GlobalKey<FormState>();
   final FirebaseService firebaseService = FirebaseService();
-  final streemdata =
-      FirebaseFirestore.instance.collection("AddingUsers").snapshots();
+  final searchController = TextEditingController();
+
+  String searchQuery = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: TextField(),
+      ),
       body: StreamBuilder(
-          stream: streemdata,
+          stream: firebaseService.getUserStream(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -32,7 +38,7 @@ class _HomepageState extends State<Homepage> {
             }
             if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
               return Center(
-                child: Text("No Task Addad",
+                child: Text("No user Addad",
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
@@ -40,18 +46,33 @@ class _HomepageState extends State<Homepage> {
                     )),
               );
             }
+
+            final users = snapshot.data!.docs.where((doc) {
+              final name = doc['name'].toLowerCase();
+              final phoneNumber = doc['phoneNumber'].toLowerCase();
+              return name.contains(searchQuery) ||
+                  phoneNumber.contains(searchQuery);
+            }).toList();
+
+            if (users.isEmpty) {
+              return Center(
+                child: Text("No matching users found"),
+              );
+            }
+
             return ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
-             var userid = snapshot.data!.docs[index];
-             var userName = userid["name"];
-             var userphone = userid["phoneNumber"];
-             return ListTile(
-              leading: CircleAvatar(),
-              title: CustomText(text: userName),
-              subtitle: CustomText(text: userphone),
-             );
-            },);
+                var userid = snapshot.data!.docs[index];
+                var userName = userid["name"];
+                var userphone = userid["phoneNumber"];
+                return ListTile(
+                  leading: CircleAvatar(),
+                  title: CustomText(text: userName),
+                  subtitle: CustomText(text: userphone),
+                );
+              },
+            );
           }),
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
@@ -146,20 +167,6 @@ class _HomepageState extends State<Homepage> {
                           nameController.clear();
                           phoneNumberController.clear();
                           ageController.clear();
-                          // if (nameController.text.isNotEmpty &&
-                          //     phoneNumberController.text.isNotEmpty &&
-                          //     ageController.text.isNotEmpty) {
-                          //   FirebaseFirestore.instance
-                          //       .collection("AddingUsers")
-                          //       .add({
-                          //     'name': nameController.text,
-                          //     'phoneNumber': phoneNumberController.text,
-                          //     'age': ageController.text
-                          //   });
-                          //   nameController.clear();
-                          //   phoneNumberController.clear();
-                          //   Navigator.of(context).pop();
-                          // }
                         },
                         child: Text("Save"))
                   ],
@@ -177,3 +184,4 @@ class _HomepageState extends State<Homepage> {
     );
   }
 }
+
