@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertest/homepage.dart';
-import 'package:fluttertest/register.dart';
+import 'package:fluttertest/auth_service/auth_service.dart';
+import 'package:fluttertest/view/homepage.dart';
+import 'package:fluttertest/view/register.dart';
 import 'package:fluttertest/widgets/custom_text.dart';
 import 'package:fluttertest/widgets/custom_textfield.dart';
 
@@ -16,22 +17,7 @@ class _LoginState extends State<Login> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final formkey = GlobalKey<FormState>();
-
-  Future<void> Signin() async {
-    if (formkey.currentState!.validate()) {
-      final email = emailController.text.trim();
-      final password = passwordController.text.trim();
-
-      UserCredential userDara = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Homepage(),
-          ));
-    }
-  }
+  final AuthService authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +39,13 @@ class _LoginState extends State<Login> {
             CustomTextField(
               hintText: "Email",
               controller: emailController,
-              validator: (value1) {
-                if (value1 == null || value1.isEmpty) {
+              validator: (value ) {
+                if (value  == null || value .isEmpty) {
                   return "Please enter your email";
                 }
                 if (!RegExp(
                         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value1)) {
+                    .hasMatch(value )) {
                   return 'Enter a valid email!';
                 }
                 return null;
@@ -71,20 +57,23 @@ class _LoginState extends State<Login> {
             CustomTextField(
               hintText: "Password",
               controller: passwordController,
-              validator: (value2) {
-                if (value2 == null || value2.isEmpty) {
+              validator: (value ) {
+                if (value  == null || value .isEmpty) {
                   return "please enter your password";
                 }
-                if (!RegExp((r'[A-Z]')).hasMatch(value2)) {
+                if (!RegExp((r'[A-Z]')).hasMatch(value )) {
                   return 'Uppercase letter is missing';
                 }
-                if (!RegExp((r'[a-z]')).hasMatch(value2)) {
+                if (!RegExp((r'[a-z]')).hasMatch(value )) {
                   return 'Lowercase letter is missing';
                 }
-                if (!RegExp((r'[0-9]')).hasMatch(value2)) {
+                if (!RegExp((r'[0-9]')).hasMatch(value )) {
                   return 'Digit is missing';
                 }
-                if (value2.length < 5) {
+                if (!RegExp((r'[!@#\$&*~]')).hasMatch(value )) {
+                  return 'Special character is missing';
+                }
+                if (value .length < 5) {
                   return "Password must have 8 characters";
                 }
                 return null;
@@ -94,15 +83,22 @@ class _LoginState extends State<Login> {
               height: 10,
             ),
             ElevatedButton(
-                onPressed: () => Signin(), child: CustomText(text: "Login")),
-                SizedBox(
-            height: 10,
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Register()));
-            },
-            child: Center(child: Text("Don't have an account? sign up")))
+                onPressed: () {
+                  if (formkey.currentState!.validate()) {
+                    authService.signIn(
+                        emailController.text, passwordController.text, context);
+                  }
+                },
+                child: CustomText(text: "Login")),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Register()));
+                },
+                child: Center(child: Text("Don't have an account? sign up")))
           ],
         ),
       ),

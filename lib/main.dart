@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:fluttertest/firebase_options.dart';
-import 'package:fluttertest/login.dart';
-import 'package:fluttertest/register.dart';
+import 'package:fluttertest/view/login.dart';
+import 'package:fluttertest/view/register.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
