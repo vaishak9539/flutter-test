@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertest/service/firebase_service.dart';
+import 'package:fluttertest/widgets/custom_text.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -13,18 +15,44 @@ class _HomepageState extends State<Homepage> {
   final phoneNumberController = TextEditingController();
   final ageController = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  final FirebaseService firebaseService = FirebaseService();
+  final streemdata =
+      FirebaseFirestore.instance.collection("AddingUsers").snapshots();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Text("data")),
-
-      // floatingActionButton: FloatingActionButton(
-      //   shape:RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(20)
-      //   ),
-      //   onPressed: () => null,child: Icon(Icons.add),),
-      //   floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-
+      body: StreamBuilder(
+          stream: streemdata,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            }
+            if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+              return Center(
+                child: Text("No Task Addad",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                      fontSize: 18,
+                    )),
+              );
+            }
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (context, index) {
+             var userid = snapshot.data!.docs[index];
+             var userName = userid["name"];
+             var userphone = userid["phoneNumber"];
+             return ListTile(
+              leading: CircleAvatar(),
+              title: CustomText(text: userName),
+              subtitle: CustomText(text: userphone),
+             );
+            },);
+          }),
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
@@ -48,6 +76,12 @@ class _HomepageState extends State<Homepage> {
                                 decoration: InputDecoration(
                                   hintText: "Name",
                                 ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your name';
+                                  }
+                                  return null;
+                                },
                               )),
                           Padding(
                             padding: const EdgeInsets.only(top: 10),
@@ -59,6 +93,15 @@ class _HomepageState extends State<Homepage> {
                                   decoration: InputDecoration(
                                     hintText: "ph Number",
                                   ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return "Please enter your PhoneNumber";
+                                    }
+                                    if (value.length < 10) {
+                                      return "Contact number must be at least 10 digits";
+                                    }
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.number,
                                 )),
                           ),
@@ -72,6 +115,12 @@ class _HomepageState extends State<Homepage> {
                                   decoration: InputDecoration(
                                     hintText: "age",
                                   ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your age';
+                                    }
+                                    return null;
+                                  },
                                   keyboardType: TextInputType.number,
                                 )),
                           ),
@@ -87,21 +136,30 @@ class _HomepageState extends State<Homepage> {
                         child: Text("Cancel")),
                     TextButton(
                         onPressed: () {
-                          if (nameController.text.isNotEmpty &&
-                              phoneNumberController.text.isNotEmpty &&
-                              ageController.text.isNotEmpty
-                              ) {
-                            FirebaseFirestore.instance
-                                .collection("AddingUsers")
-                                .add({
-                              'name': nameController.text,
-                              'phoneNumber': phoneNumberController.text,
-                              'age' : ageController.text
-                            });
-                            nameController.clear();
-                            phoneNumberController.clear();
-                            Navigator.of(context).pop();
+                          if (formkey.currentState!.validate()) {
+                            firebaseService.addUser(
+                                nameController.text,
+                                phoneNumberController.text,
+                                ageController.text,
+                                context);
                           }
+                          nameController.clear();
+                          phoneNumberController.clear();
+                          ageController.clear();
+                          // if (nameController.text.isNotEmpty &&
+                          //     phoneNumberController.text.isNotEmpty &&
+                          //     ageController.text.isNotEmpty) {
+                          //   FirebaseFirestore.instance
+                          //       .collection("AddingUsers")
+                          //       .add({
+                          //     'name': nameController.text,
+                          //     'phoneNumber': phoneNumberController.text,
+                          //     'age': ageController.text
+                          //   });
+                          //   nameController.clear();
+                          //   phoneNumberController.clear();
+                          //   Navigator.of(context).pop();
+                          // }
                         },
                         child: Text("Save"))
                   ],

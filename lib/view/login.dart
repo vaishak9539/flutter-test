@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertest/auth_service/auth_service.dart';
+import 'package:fluttertest/service/auth_service.dart';
 import 'package:fluttertest/view/homepage.dart';
 import 'package:fluttertest/view/register.dart';
 import 'package:fluttertest/widgets/custom_text.dart';
