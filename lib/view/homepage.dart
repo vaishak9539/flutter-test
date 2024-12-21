@@ -1,6 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertest/service/firebase_service.dart';
+import 'package:fluttertest/view/tabbars.dart';
 import 'package:fluttertest/widgets/custom_text.dart';
 
 class Homepage extends StatefulWidget {
@@ -25,7 +25,30 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: TextField(),
+        title: SizedBox(
+          width: 280,
+          child: TextFormField(
+            controller: searchController,
+            decoration: InputDecoration(
+              hintText: "Search by name or phone",
+              prefixIcon: Icon(Icons.search),
+              // border: InputBorder.none
+            ),
+            onChanged: (value) {
+              setState(() {
+                searchQuery = value.toLowerCase();
+              });
+            },
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right:10 ),
+            child: IconButton(onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Tabbars(),));
+            }, icon: Icon(Icons.sort),),
+          )
+        ],
       ),
       body: StreamBuilder(
           stream: firebaseService.getUserStream(),
@@ -61,13 +84,15 @@ class _HomepageState extends State<Homepage> {
             }
 
             return ListView.builder(
-              itemCount: snapshot.data!.docs.length,
+              itemCount: users.length,
               itemBuilder: (context, index) {
-                var userid = snapshot.data!.docs[index];
+                var userid = users[index];
                 var userName = userid["name"];
                 var userphone = userid["phoneNumber"];
                 return ListTile(
-                  leading: CircleAvatar(),
+                  leading: CircleAvatar(
+                    child: Text(userName[0].toUpperCase()),
+                  ),
                   title: CustomText(text: userName),
                   subtitle: CustomText(text: userphone),
                 );
@@ -184,4 +209,3 @@ class _HomepageState extends State<Homepage> {
     );
   }
 }
-

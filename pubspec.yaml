@@ -28,6 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  flutter:
+    sdk: flutter
   cloud_firestore: ^5.5.0
   dropdown_button2: ^2.3.9
   firebase_auth: ^5.3.3
@@ -39,17 +41,9 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.3.3
 cupertino_icons: ^1.0.8
-# firebase_core: ^3.4.0
-# firebase_auth: ^5.2.0
-# cloud_firestore: ^5.4.0
-# firebase_storage: ^12.3.0
-# google_fonts: ^6.2.1
-# image_picker: ^1.0.4
+
 path: ^1.9.0
-# flutter_screenutil: ^5.9.3
-# dropdown_button2: ^2.3.9
-# shared_preferences: ^2.3.2
-# provider: ^6.1.2
+
 dev_dependencies:
   flutter_lints: ^3.0.0
   flutter_test:

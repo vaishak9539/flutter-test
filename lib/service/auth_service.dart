@@ -49,7 +49,8 @@ class AuthService {
   Future<void> signIn(
       String email, String password, BuildContext context) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      // UserCredential userCredential =
+       await _auth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
       );

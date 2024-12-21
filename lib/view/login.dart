@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertest/service/auth_service.dart';
-import 'package:fluttertest/view/homepage.dart';
 import 'package:fluttertest/view/register.dart';
 import 'package:fluttertest/widgets/custom_text.dart';
 import 'package:fluttertest/widgets/custom_textfield.dart';
@@ -18,6 +16,7 @@ class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final formkey = GlobalKey<FormState>();
   final AuthService authService = AuthService();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +28,13 @@ class _LoginState extends State<Login> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CustomText(
-              text: "Sign in",
+              text: "Welcome Back!",
               size: 24,
+              weight: FontWeight.bold,
+            ),
+            CustomText(
+              text: "Sign in to your account",
+              size: 15,
               weight: FontWeight.w400,
             ),
             SizedBox(
@@ -98,10 +102,24 @@ class _LoginState extends State<Login> {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Register()));
                 },
-                child: Center(child: Text("Don't have an account? sign up")))
+                child: Center(child: Text("Don't have an account? sign up"))),
+
+                // ElevatedButton(onPressed: () => signInWithGoogle(), child: Text("Google"))
           ],
         ),
       ),
     );
+    
   }
+  // signInWithGoogle()async{
+  //   GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  //   GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+  //   AuthCredential credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth?.accessToken,
+  //     idToken: googleAuth?.idToken
+  //   );
+  //   UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+  //   print(userCredential.user?.displayName);
+  // }
 }
